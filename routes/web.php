@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/login', [\App\Http\Controllers\GoogleLoginController::class, 'redirect']);
-Route::get('/callback', [\App\Http\Controllers\GoogleLoginController::class, 'callback']);
+Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name("home");
+Route::get('/login', [\App\Http\Controllers\GoogleLoginController::class, 'redirect'])->name("login");
+Route::get('/logout', [\App\Http\Controllers\GoogleLoginController::class, 'logout'])->name("logout");
+Route::get('/callback', [\App\Http\Controllers\GoogleLoginController::class, 'callback'])->name("callback");
