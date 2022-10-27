@@ -43,7 +43,18 @@ class DatabaseSeeder extends Seeder
             ['name'=>'넹이뻐','content'=>'실은 뻥이요를 더 좋아합니다.','stock_count'=>1000],
             ['name'=>'즐택스','content'=>'즐!이나 먹으라지!','stock_count'=>1000],
         ];
-        DB::table("stocks")->insert($stockAr);
+        foreach($stockAr as $v){
+            $stock_id=DB::table("stocks")->insertGetId($v);
+            $price=rand(120,400)*100;
+            DB::table("stock_historys")->insertGetId([
+                'stock_id'=>$stock_id,
+                'before_amount'=>$price,
+                'now_amount'=>$price,
+                'type'=>"START",
+                'limit_percent'=>0,
+            ]);
+        }
+        
     
         //DB::table("stock_historys")->insert($stockAr);
     }
