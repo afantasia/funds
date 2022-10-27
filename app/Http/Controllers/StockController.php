@@ -42,6 +42,7 @@ class StockController extends Controller
         
         $historyModel->insert([
             'stock_id'=>$newsData->stock_id,
+            'news_id'=>$idx,
             'before_amount'=>$historyData->now_amount,
             'now_amount'=>$nowAmount,
             'type'=>$newsData->type,
