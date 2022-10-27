@@ -10,11 +10,13 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
+
 class GoogleLoginController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     
-    public function redirect() {
+    public function redirect()
+    {
         $parameters = ['access_type' => 'offline', "prompt" => "consent select_account"];
         return Socialite::driver('google')
             ->scopes(['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/forms'])
@@ -22,29 +24,39 @@ class GoogleLoginController extends BaseController
             ->redirect();
     }
     
-    public function callback(Request $request) {
+    public function callback(Request $request)
+    {
         $userInfo = Socialite::driver('google')->user();
-        $model=new User();
+        $model = new User();
         //있으면 넣고 없으면 업데이트
-        $user=$model->where([
-            ["email","=",$userInfo->getEmail()],
+        $user = $model->where([
+            ["email", "=", $userInfo->getEmail()],
         ])->first();
         
-        $params=[
-            'name'=>$userInfo->getName(),
-            'nick_name'=>$userInfo->getNickname(),
-            'avatar'=>$userInfo->getAvatar(),
-            'password'=>"NONE",
-            'token'=>$userInfo->token,
-            'refresh_token'=>$userInfo->refreshToken,
+        $params = [
+            'name' => $userInfo->getName(),
+            'nick_name' => $userInfo->getNickname(),
+            'avatar' => $userInfo->getAvatar(),
+            'password' => "NONE",
+            'token' => $userInfo->token,
+            'refresh_token' => $userInfo->refreshToken,
         ];
-        if(!isset($user->id)){
-            $params['email']=$userInfo->getEmail();
-            $params['email_verified_at']=date("Y-m-d H:i:s");
-            $sessionID=$model->insertGetID($params);
-        }else{
-            $sessionID=$user->id;
-            $model->where("id",$sessionID)->update($params);
+        if (!isset($user->id)) {
+            $params['email'] = $userInfo->getEmail();
+            $params['email_verified_at'] = date("Y-m-d H:i:s");
+            $sessionID = $model->insertGetID($params);
+            //캐시만땅한번 충전
+            DB::table("stock_trades")->insert([
+                'user_id' => $sessionID,
+                'title' => "초기 비용 자금 투척",
+                'before_amount' => 0,
+                'calc_amount' => env('DEFAULT_STOCK_CASH', 10000000),
+                'fee_amount' => 0,
+                'now_amount' => env('DEFAULT_STOCK_CASH', 10000000),
+            ]);
+        } else {
+            $sessionID = $user->id;
+            $model->where("id", $sessionID)->update($params);
         }
         Auth::login($user);
         return redirect(route("home"));
