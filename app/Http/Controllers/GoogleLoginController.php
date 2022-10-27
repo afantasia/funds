@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockTradesModel;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -45,19 +46,13 @@ class GoogleLoginController extends BaseController
             $params['email'] = $userInfo->getEmail();
             $params['email_verified_at'] = date("Y-m-d H:i:s");
             $sessionID = $model->insertGetID($params);
-            //캐시만땅한번 충전
-            DB::table("stock_trades")->insert([
-                'user_id' => $sessionID,
-                'title' => "초기 비용 자금 투척",
-                'before_amount' => 0,
-                'calc_amount' => env('DEFAULT_STOCK_CASH', 10000000),
-                'fee_amount' => 0,
-                'now_amount' => env('DEFAULT_STOCK_CASH', 10000000),
-            ]);
         } else {
             $sessionID = $user->id;
             $model->where("id", $sessionID)->update($params);
         }
+    
+        $stockTradeModel=new StockTradesModel();
+        $stockTradeModel->defaultCharge($sessionID);
         Auth::login($user);
         return redirect(route("home"));
     }
