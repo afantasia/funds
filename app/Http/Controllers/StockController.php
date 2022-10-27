@@ -14,11 +14,12 @@ class StockController extends Controller
         $stockInfo=DB::table("stocks")->inRandomOrder()->first();
         $title=$this->replaceParam($newsStringInfo->title);
         $newsModel=new NewsFeedModel();
+        $typeAr=collect(['PLUS',"MINUS","FIXED"])->random();
         $insArray=[
             'stock_id'=>$stockInfo->id,
             'title'=>$title,
-            'type'=>collect(['PLUS',"MINUS","FIXED"])->random(),
-            'limit_percent'=>rand(0,1000)/100,
+            'type'=>$typeAr,
+            'limit_percent'=>$typeAr =="FIXED" ? 0 : rand(0,1000)/100,
         ];
         $idx=$newsModel->insertGetId($insArray);
         $this->stockChanger($idx);
