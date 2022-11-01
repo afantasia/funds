@@ -12,6 +12,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.4",
         "socialiteproviders/google": "^4.1"
     },
     "require-dev": {

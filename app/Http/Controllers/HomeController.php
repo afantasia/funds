@@ -11,16 +11,7 @@ class HomeController extends Controller
     //
     public function index(Request $request)
     {
-        dump(Auth::check());
-        dump(Auth::id());
-        
-        
-        
-        
-        
-        
-        
-        
-        return view("welcome");
+        $d=$this->getRouteLists();
+        return view("layout");
     }
 }

@@ -35,4 +35,21 @@ class Controller extends BaseController
         }
         return $string;
     }
+    
+    public function getRouteLists()
+    {
+        
+        $pathArray=[];
+        $routeLists = \Route::getRoutes()->get();
+        foreach($routeLists as $k=>$route){
+            
+            if(isset($route->action['as']) && collect($route->action)->contains(['web'])  ){
+                $pathArray[$route->action['as']]=["methods"=>$route->methods[0],"uri"=>$route->uri];
+            }
+            //debug(collect($route)->toArray());
+            
+        }
+        
+        return $pathArray;
+    }
 }
