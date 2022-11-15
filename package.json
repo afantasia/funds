@@ -26,7 +26,13 @@
     },
     "dependencies": {
         "bootstrap-vue": "^2.23.1",
+        "chart.js": "^3.9.1",
+        "chartjs": "^0.3.24",
+        "chartjs-chart-financial": "^0.1.1",
+        "trading-vue-js": "^1.0.2",
+        "trading-vue-js-ko": "^1.0.1",
         "v-tooltip": "^2.1.3",
+        "vue-chartjs": "^4.1.2",
         "vue-cookies": "^1.8.2"
     }
 }

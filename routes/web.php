@@ -22,4 +22,6 @@ Route::get('/callback', [\App\Http\Controllers\GoogleLoginController::class, 'ca
 
 Route::name("stock.")->prefix("/stock/")->group(function(){
     Route::get("getNews",[\App\Http\Controllers\StockController::class,'getNews'])->name("getNews");
+    Route::get("getCompany",[\App\Http\Controllers\StockController::class,'getCompany'])->name("getCompany");
+    Route::get("getStockHistory/{stockId}",[\App\Http\Controllers\StockController::class,'getStockHistory'])->name("getStockHistory");
 });

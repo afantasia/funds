@@ -14,9 +14,9 @@
 
     <div id="app-header">
         @auth
-            <button class="btn btn-primary" bind="logout" param-url="{!! route('logout') !!}">로그아웃</button>
+            <a href="{!! route('login') !!}" class="btn btn-primary" >로그아웃</a>
         @else
-            <button class="btn btn-primary" bind="login" param-url="{!! route('login') !!}">로그인</button>
+            <a class="btn btn-primary" href="{!! route('login') !!}">로그인</a>
         @endauth
     </div>
     <div id="app-body">

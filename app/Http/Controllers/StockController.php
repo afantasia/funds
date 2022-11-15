@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NewsFeedModel;
 use App\Models\StockHistoryModel;
+use App\Models\StockModel;
 use Illuminate\Http\Request;
 use DB;
 class StockController extends Controller
@@ -15,6 +16,14 @@ class StockController extends Controller
         })->select("news_feeds.*","stocks.name")->orderBy("news_feeds.created_at","desc")->take(10)->get();
         return $datas;
     }
+    
+    public function getCompany(Request $request){
+        $stockModel=new StockModel();
+        $datas=$stockModel->get();
+        return $datas;
+    }
+    
+    
     //
     public function makeNews(){
         $newsStringInfo=DB::table("news_words")->inRandomOrder()->first();
@@ -32,6 +41,15 @@ class StockController extends Controller
         $this->stockChanger($idx);
         return $idx;
     }
+    public function getStockHistory($stockId)
+    {
+        $model=new StockHistoryModel();
+        $datas=$model->where("stock_id",$stockId)->orderBy("created_at","desc")->get();
+        return $datas;
+    }
+    
+    
+    
     //
     public function stockChanger($idx){
         $newsData=NewsFeedModel::find($idx);

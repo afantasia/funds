@@ -8,6 +8,7 @@ require('./bootstrap');
 
 window.Vue = require('vue').default;
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import {Chart} from 'vue-chartjs';
 
 /**
  * The following block of code may be used to automatically register your
@@ -63,13 +64,6 @@ Vue.use(TablePlugin)
 Vue.component('app-body',require("./components/main.vue").default);
 
 
-
-axios.post("/").then((result)=>{
-    Vue.$cookies.set("Route",result.data);
-});
-
-
-//axios.defaults.headers.common['X-CSRF-TOKEN']=document.querySelector("meta[name='csrf-token']").content
 //실행하긔
 const app = new Vue({
     el: '#app',
