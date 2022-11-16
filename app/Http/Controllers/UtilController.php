@@ -35,7 +35,7 @@ class UtilController extends Controller
         if($request->fileType=='zip'){
             $zip=new \ZipArchive();
             $downFileLoc=storage_path("app/".'util/pdf/'.date("Ymd")."/".$svFileName).".zip";
-            if ($zip->open($zipFileLoc, \ZipArchive::CREATE)== TRUE){
+            if ($zip->open($downFileLoc, \ZipArchive::CREATE)== TRUE){
                 foreach($imgLists as $imgList) {
                     $relativeName = basename($imgList);
                     $zip->addFile(storage_path("app/").$imgList,$relativeName);
