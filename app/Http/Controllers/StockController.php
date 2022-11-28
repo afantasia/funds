@@ -43,8 +43,13 @@ class StockController extends Controller
     }
     public function getStockHistory($stockId)
     {
+        $interval = isset(request()->interval) ? request()->interval : 300;
         $model=new StockHistoryModel();
-        $datas=$model->where("stock_id",$stockId)->orderBy("created_at","desc")->get();
+        $datas=$model->select(DB::raw("FROM_UNIXTIME(CAST(UNIX_TIMESTAMP(created_at)/{$interval} AS SIGNED)*{$interval}) as created_at,max(now_amount) as max_amount,min(now_amount) as min_amount"))->where("stock_id",$stockId)
+        ->groupBy(DB::raw("FROM_UNIXTIME(CAST(UNIX_TIMESTAMP(created_at)/{$interval} AS SIGNED)*{$interval}) "))
+        ->orderBy("created_at","desc")->take(500)->get();
+        
+        
         return $datas;
     }
     

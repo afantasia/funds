@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body >
-<div class="wrap" id="app">
+<div class="wrap">
 
     <div id="app-header">
         @auth
@@ -19,10 +19,19 @@
             <a class="btn btn-primary" href="{!! route('login') !!}">로그인</a>
         @endauth
     </div>
-    <div id="app-body">
-        <app-body></app-body>
+    <div id="app">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <news/>
+                </div>
+                <div class="col-6">
+                    <charts/>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>
-<script src="/js/app.js?id={!! date("His") !!}"></script>
+<script src="{{ mix('js/app.js') }}"></script>
 </html>
