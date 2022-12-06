@@ -1,14 +1,20 @@
 <template>
     <div class="card">
         <div class="card-header">
-            <h1>{{ title }}</h1>
-            ㅇㅇㅇㅇ
-            <select  @change="getStockHistory();">
-                <option
-                    v-for="item in companys"
-                    :value="item.id"
-                 >{{item.name}}</option>
-            </select>
+
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h1>{{ title }}</h1>
+                </div>
+                <div>
+                    <select  @change="getStockHistory();" id="companyLists" class="form-select">
+                        <option
+                            v-for="item in companys"
+                            :value="item.id"
+                        >{{item.name}}</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div id="chart">
@@ -63,15 +69,38 @@ export default {
                         height: 350
                     },
                     title: {
-                        text: 'CandleStick Chart',
+                        text: document.querySelector('#companyLists  > option:checked').text.trim()+' 차트내역서',
                         align: 'left'
                     },
                     xaxis: {
-                        type: 'datetime'
+                        labels: {
+                            formatter: function (value, timestamp) {
+                                const xDate = new Date(value);
+
+                                return xDate.getFullYear() + "-" +
+                                    ("00" + (xDate.getMonth() + 1)).slice(-2) + "-" +
+                                    ("00" + xDate.getDate()).slice(-2) + " " +
+                                    ("00" + xDate.getHours()).slice(-2) + ":" +
+                                    ("00" + xDate.getMinutes()).slice(-2)
+                            },
+                        }
                     },
                     yaxis: {
                         tooltip: {
                             enabled: true
+                        },
+
+                        labels: {
+                            /**
+                             * Allows users to apply a custom formatter function to yaxis labels.
+                             *
+                             * @param { String } value - The generated value of the y-axis tick
+                             * @param { index } index of the tick / currently executing iteration in yaxis labels array
+                             */
+                            formatter: function(val, index) {
+                                return val.toFixed(2);
+                            },
+
                         }
                     }
                 };

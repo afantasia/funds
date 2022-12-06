@@ -11,22 +11,22 @@
 </head>
 <body >
 <div class="wrap">
-
-    <div id="app-header">
-        @auth
-            <a href="{!! route('login') !!}" class="btn btn-primary" >로그아웃</a>
-        @else
-            <a class="btn btn-primary" href="{!! route('login') !!}">로그인</a>
-        @endauth
-    </div>
     <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light" @auth loginid="{!! Auth::id() !!}" @endauth>
+            <navi/>
+        </nav>
         <div class="container-fluid">
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col-6">
                     <news/>
                 </div>
                 <div class="col-6">
                     <charts/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <trades/>
                 </div>
             </div>
         </div>

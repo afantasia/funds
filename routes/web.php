@@ -26,6 +26,14 @@ Route::name("stock.")->prefix("/stock/")->group(function(){
     Route::get("getStockHistory/{stockId}",[\App\Http\Controllers\StockController::class,'getStockHistory'])->name("getStockHistory");
 });
 
+
+Route::name("trade.")->prefix("/trade/")->group(function(){
+    Route::any("getTradeHistory",[\App\Http\Controllers\TradeController::class,'getTradeHistory'])->name("getTradeHistory");
+});
+
+
+
+
 Route::name("util.")->prefix("/util/")->group(function(){
     Route::get("/",[\App\Http\Controllers\UtilController::class,'index'])->name("index");
     Route::post("/upload",[\App\Http\Controllers\UtilController::class,'Upload'])->name("upload");
