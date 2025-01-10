@@ -5,7 +5,10 @@
     <title>ㅔ?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Custom fonts for this template-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
     <script
         src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -48,6 +51,14 @@
                 console.error('CSRF meta tag not found in the document.');
             }
         });
+
+
+        function notify(title, message) {
+            $("#liveToast .toast-header strong").text(title);
+            $("#liveToast .toast-body").text(message);
+            $("#liveToast").toast("show");
+        }
+
     </script>
 </head>
 <body >
@@ -76,6 +87,60 @@
 </div>
 @include("components.buyForm")
 @include("components.sellForm")
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto"></strong>
+                <small></small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+    // 전역 변수 선언
+    let globalCache = null;
+
+    // 캐시 동기화 함수
+    const syncCache = async () => {
+        try {
+            const response = await axios.get('/sync');
+            if (response.data.status === 'success') {
+                const newCache = response.data.data;
+                // 캐시 값이 변경되었는지 확인
+                if (JSON.stringify(globalCache) !== JSON.stringify(newCache)) {
+                    globalCache = newCache; // 변경된 값으로 갱신
+                    // 변경에 따른 추가 작업 실행
+                    handleCacheUpdate(globalCache);
+                } else {
+                    console.log('Cache is up-to-date.');
+                }
+            } else {
+                console.warn('No cache value available.');
+            }
+        } catch (error) {
+            console.error('Error fetching cache:', error);
+        }
+    };
+
+    // 캐시 변경 시 추가 작업을 처리하는 함수
+    const handleCacheUpdate = (updatedCache) => {
+        console.log('Updated Cache:', updatedCache);
+        // 필요한 추가 로직을 여기에 작성
+        notify("NEWS", "새로운 뉴스가 있습니다.")
+    };
+
+    // 페이지 로드 시 초기화 및 주기적 동기화
+    document.addEventListener('DOMContentLoaded', () => {
+        syncCache(); // 초기 캐시 동기화
+        // 5초마다 캐시 동기화
+        const second = 60 * 1000;
+        setInterval(syncCache, second);
+    });
+
+
+</script>
+
 </html>

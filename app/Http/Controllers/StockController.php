@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\NewsFeedModel;
 use App\Models\StockHistoryModel;
 use App\Models\StockModel;
+use Dompdf\Image\Cache;
 use Illuminate\Http\Request;
 use DB;
+
 class StockController extends Controller
 {
     public function getNews(Request $request){
@@ -16,14 +18,14 @@ class StockController extends Controller
         })->select("news_feeds.*","stocks.name")->orderBy("news_feeds.created_at","desc")->take(10)->get();
         return $datas;
     }
-    
+
     public function getCompany(Request $request){
         $stockModel=new StockModel();
         $datas=$stockModel->get();
         return $datas;
     }
-    
-    
+
+
     //
     public function makeNews(){
         $newsStringInfo=DB::table("news_words")->inRandomOrder()->first();
@@ -39,6 +41,8 @@ class StockController extends Controller
         ];
         $idx=$newsModel->insertGetId($insArray);
         $this->stockChanger($idx);
+        // 영구적으로 캐시 저장
+        \Illuminate\Support\Facades\Cache::forever("PUT_KEY", $idx);
         return $idx;
     }
     public function getStockHistory($stockId)
@@ -48,13 +52,11 @@ class StockController extends Controller
         $datas=$model->select(DB::raw("FROM_UNIXTIME(CAST(UNIX_TIMESTAMP(created_at)/{$interval} AS SIGNED)*{$interval}) as created_at,max(now_amount) as max_amount,min(now_amount) as min_amount"))->where("stock_id",$stockId)
         ->groupBy(DB::raw("FROM_UNIXTIME(CAST(UNIX_TIMESTAMP(created_at)/{$interval} AS SIGNED)*{$interval}) "))
         ->orderBy("created_at","desc")->take(500)->get();
-        
-        
         return $datas;
     }
-    
-    
-    
+
+
+
     //
     public function stockChanger($idx){
         $newsData=NewsFeedModel::find($idx);
@@ -68,7 +70,7 @@ class StockController extends Controller
         }else{
             $nowAmount=$historyData->now_amount;
         }
-        
+
         $historyModel->insert([
             'stock_id'=>$newsData->stock_id,
             'news_id'=>$idx,
@@ -77,6 +79,6 @@ class StockController extends Controller
             'type'=>$newsData->type,
             'limit_percent'=>$newsData->limit_percent,
         ]);
-    
+
     }
 }

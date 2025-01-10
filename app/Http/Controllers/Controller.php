@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use http\Env\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use DB;
+use Illuminate\Support\Facades\Cache;
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    
+
     function replaceParam($string){
         preg_match_all('/\{([^{}]+)\}/',$string,$tmpParseAr);
         $strAr=[];
@@ -35,21 +38,33 @@ class Controller extends BaseController
         }
         return $string;
     }
-    
+
     public function getRouteLists()
     {
-        
+
         $pathArray=[];
         $routeLists = \Route::getRoutes()->get();
         foreach($routeLists as $k=>$route){
-            
+
             if(isset($route->action['as']) && collect($route->action)->contains(['web'])  ){
                 $pathArray[$route->action['as']]=["methods"=>$route->methods[0],"uri"=>$route->uri];
             }
             //debug(collect($route)->toArray());
-            
+
         }
-        
+
         return $pathArray;
+    }
+
+    public function getCache(){
+        $cacheKey = "PUT_KEY"; // 저장된 캐시 키
+        $cachedValue = Cache::get($cacheKey); // 캐시 값 가져오기
+        if ($cachedValue === null) {
+            $cachedValue = 0;
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $cachedValue,
+        ]);
     }
 }
