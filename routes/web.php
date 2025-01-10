@@ -30,4 +30,4 @@ Route::name("user.")->prefix("/user/")->group(function(){
     Route::post("sell",[\App\Http\Controllers\TradeController::class,'createSell'])->name("sell");
     Route::any("inventory",[\App\Http\Controllers\TradeController::class,'getMyInventory'])->name("getMyInventory");
 });
-
+Route::get('sync',[\App\Http\Controllers\Controller::class,'getCache'])->name("sync");
