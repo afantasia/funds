@@ -36,7 +36,7 @@ return [
         'token_uri' => env('GOOGLE_TOKEN_URL'),
         'auth_provider_x509_cert_url'=>"https://www.googleapis.com/oauth2/v1/certs",
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect'=>env('GOOGLE_CALLBACK_URI'),
+        'redirect'=>env('GOOGLE_CALLBACK_URI',"https://funds.env/callback"),
         'javascript_origins' => env('APP_URL')
     ],
 ];

@@ -23,7 +23,7 @@ class StockTradesModel extends Model
                 'now_amount' => env('DEFAULT_STOCK_CASH', 10000000),
             ]);
         }
-        
+
         return;
     }
 }
