@@ -9,5 +9,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class inventoryModel extends Model
 {
     use SoftDeletes;
-    protected $table = 'stock_historys';
+    protected $table = 'inventories';
 }
