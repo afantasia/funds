@@ -1,64 +1,47 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# 주식망겜(토이프로젝트)
+## 개요 
+    1. Laravel / BS5 기반의 간단한 토이프로젝트 진행
+    2. 간단하게 그냥 잉여 트래픽을 낭비하고 싶은 사람들을 위해 웹페이지 게임을 만든다
+    3. 리소스 낭비와 재능낭비를 한방에!
+    
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 사용 API or 권장 API
+    1. 구글 oAuth2(로그인이 귀찮은 여러분들을 위해!) 
+    2-1. FCM (웹푸시를 이용한 리스너 삽입)
+    2-2. REDIS & NodeJS & socket.IO (웹소켓을 통한 리스너 삽입)
+    2-3. pusher (웹소켓을 좀 쉽게 사용하기 위한 API 연동)
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 사용자 기반 프로세스
+    1. 가상의 업체+주식이 발행됨(초기세팅)
+    2. 뉴스가 돌면서 실시간으로 뉴스가 올라왔는지에 대한 여부가 올라옴
+    3. 뉴스기사에 간략한 내용을 확인할수 있으며 판단하여 주식을 매수,매도함
+    4. 자신의 늘어난 자산을 보며 흐뭇해한다.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 개발자 기반 프로세스 로직
+    1. 스케줄러에서 랜덤 기사가 생성됨
+    2. 기사가 생성되면서 트리거로 해당 주식의 증감치가 로깅됨
+    3. 로깅과 동시에 "시세가 변경"됨
+    4. 매수,매도시 최근 시세로 매수,매도 처리됨( 해당 주식 발행갯수 이상 구매가 불가)
 
-## Learning Laravel
+## Todo List
+    1. 부분매도기능
+    2. 랭킹순위보기(자산보기)
+    3. 내 투자 내역 확인하기
+    4. 발행주식,발행사 관리 기능
+    5. 주식추가발행기능(추가발행시 어떻게 처리를 해야할것인지)
+    6. 마포대교 급행열차(현재 자산을 리셋처리 다시 게임을 시작)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## T.M.I
+    1. 무언가 모티베이션이나 베네핏이 부족함
+    2. 사업성이 떨어짐
+    3. 주식과 관련한 캔들차트를 붙여두었으나, 오히려 가시성이 떨어짐
+    4. 말이 주식이지, 그냥 차트를 선형그래프로 보여줘도 괜찮아보임
+    5. 증감폭의 비율조정, 기사에 따른 증감유무의 확률 조정이 필요해보임  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+    
+    
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
