@@ -40,7 +40,6 @@
                     'y':[data.max_amount,data.max_amount,data.min_amount,data.min_amount]
                 });
             });
-            console.log(result.data);
             var options = {
                 series: [{
                     data:ctDatas,

@@ -11,7 +11,12 @@ class HomeController extends Controller
     //
     public function index(Request $request)
     {
-        $d=$this->getRouteLists();
-        return view("layout");
+        $params=[];
+        if(auth()->check()){
+            $request->type="last";
+            $info  = TradeController::getTradeHistory($request);
+            $params['now_amount'] = $info['datas']->now_amount;
+        }
+        return view("layout",$params);
     }
 }

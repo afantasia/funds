@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\users.nick_name::factory(10)->create();
         $wordAr=[
             ['title'=>'{stocks.name} 임직원 A씨 자택에서 숨쉰채 발견'],
-            ['title'=>'{users.nick_name} 가 말하기를 {stocks.name}사 주식이 오를거라고 예상'],
+            ['title'=>'투자자 {users.nick_name} 말하기를 {stocks.name}사 주식이 오를거라고 예상'],
             ['title'=>'{stocks.name}사 주식 {stocks.name}와 병합 M&A 계약 추진중'],
             ['title'=>'{users.nick_name}, {stocks.name}사 주식 풀매수 움직임 보여..'],
             ['title'=>'{users.nick_name}, {stocks.name}사 주식 풀매도 움직임 보여..'],
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             ['title'=>'{users.nick_name}, {stocks.name}사 직원 연봉이 오른다'],
             ['title'=>'{stocks.name}사 직원 집에서 졸다 보너스 지급받아 논란..'],
             ['title'=>'{stocks.name}사 직원 오늘은 치킨이닭'],
-            ['title'=>'{users.nick_name} 대주주 총회에서 비키니차림으로 등장하여 논락'],
+            ['title'=>'{users.nick_name} 대주주 총회에서 비키니차림으로 등장하여 논란'],
             ['title'=>'{stocks.name}사 총수 탑신병에 걸려 응급실행'],
             ['title'=>'{stocks.name}사 직원 A씨와 {users.nick_name} 주식 마포대교에서 팬티바람으로 티배깅댄스 추다 현장검거'],
             ['title'=>'{stocks.name}사 총수, 탕비실 커피믹스횡령 논란..'],
@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             ['title'=>'{stocks.name} 임직원, 민트초코에 대한 트윗을 남겨 논란 재점화'],
         ];
         DB::table("news_words")->insert($wordAr);
-        
+
         $stockAr=[
             ['name'=>'삼만전자','content'=>'삼만원이 돈이냐','stock_count'=>1000],
             ['name'=>'JOOGLE','content'=>'구글아님 죽을임','stock_count'=>1000],
@@ -54,8 +54,8 @@ class DatabaseSeeder extends Seeder
                 'limit_percent'=>0,
             ]);
         }
-        
-    
+
+
         //DB::table("stock_historys")->insert($stockAr);
     }
 }
