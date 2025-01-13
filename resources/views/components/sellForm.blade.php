@@ -14,9 +14,9 @@
                     </div>
                     <div class="mb-3">
                         <div>내잔액 : <span class="myPoint"></span> </div>
-                        <div>이전매도단가 :  <span class="buyAmount"></span> </div>
-                        <div>현재매도단가 :  <span class="sellAmount"></span> </div>
-                        <div>손익금 :  <span class="calcAmount"></span> </div>
+                        <div>이전매수단가 :  <span class="buyAmount"></span> / 매수합 : <span class="calcBuyAmount"></span> </div>
+                        <div>현재매도단가 :  <span class="sellAmount"></span> / 매도합 : <span class="calcSellAmount"></span> </div>
+                        <div>손익단가 :  <span class="calcAmount"></span> / 손익합 :  <span class="calcTotAmount"></span></div>
                         <div>매도 후 잔액 :  <span class="totalAmount"></span> </div>
                     </div>
                     <div class="d-grid">
@@ -60,16 +60,16 @@ $(document).ready(function(){
         $cost = $("#sellForm [name='inven_id'] option:selected").data("cost");
         $nowcost = $("#sellForm [name='inven_id'] option:selected").data("now-cost");
         $amount = $("#sellForm [name='inven_id'] option:selected").data("amount");
-        $("#sellForm .buyAmount").text($cost);
-        $("#sellForm .sellAmount").text($nowcost);
-        $("#sellForm .calcAmount").text(eval($nowcost) - eval($cost));
-        $("#sellForm .totalAmount").text( point + ($nowcost*$cost) );
+        $("#sellForm .buyAmount").text(dpPrice($cost));
+        $("#sellForm .sellAmount").text(dpPrice($nowcost));
 
+        $("#sellForm .calcBuyAmount").text(dpPrice($cost * $amount));
+        $("#sellForm .calcSellAmount").text(dpPrice($nowcost * $amount));
 
+        $("#sellForm .calcAmount").text(dpPrice(eval($nowcost) - eval($cost)));
+        $("#sellForm .calcTotAmount").text(dpPrice( (eval($nowcost) - eval($cost)) * $amount ));
+        $("#sellForm .totalAmount").text( dpPrice(point + ($nowcost*$cost)) );
 
-
-        //$("#buyForm .buyAmount").text($cost * $("#buyForm [name='inven_id']").val());
-        //$("#buyForm .calcAmount").text(point - ( $cost * $("#buyForm [name='inven_id']").val() ) );
     })
 
 

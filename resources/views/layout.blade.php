@@ -59,6 +59,18 @@
             $("#liveToast .toast-body").text(message);
             $("#liveToast").toast("show");
         }
+        function dpPrice(input) {
+            // 입력을 평가하여 숫자로 변환
+            const evaluatedInput = eval(input);
+
+            // 소수점 둘째 자리까지 반올림
+            const roundedValue = evaluatedInput.toFixed(2);
+
+            // 세 자리마다 쉼표를 추가하는 함수
+            const formattedValue = roundedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            return formattedValue;
+        }
 
     </script>
 </head>
