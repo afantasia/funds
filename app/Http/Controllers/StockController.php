@@ -34,9 +34,9 @@ class StockController extends Controller
 
     //
     public function makeNews(){
-        $newsStringInfo=DB::table("news_words")->inRandomOrder()->first();
-        $stockInfos=DB::table("stocks")->inRandomOrder()->take(rand(1,5))->get();
+        $stockInfos=DB::table("stocks")->inRandomOrder()->take(rand(2,6))->get();
         foreach($stockInfos as $stockInfo){
+            $newsStringInfo=DB::table("news_words")->inRandomOrder()->first();
             $title=$this->replaceParam($newsStringInfo->title);
             $newsModel=new NewsFeedModel();
             $typeAr=collect(['PLUS',"MINUS","FIXED"])->random();
