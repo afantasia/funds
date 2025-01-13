@@ -62,10 +62,10 @@ $(document).ready(function(){
     });
     $("#buyForm [name='buy_count'] , #buyForm [name='stock_id']").on("change",function(){
         var point = {{ isset($now_amount) ? $now_amount : 0 }};
-        $("#buyForm .myPoint").text(point);
+        $("#buyForm .myPoint").text(dpPrice(point));
         $cost = $("#buyForm [name='stock_id'] option:selected").data("cost");
-        $("#buyForm .buyAmount").text($cost * $("#buyForm [name='buy_count']").val());
-        $("#buyForm .calcAmount").text(point - ( $cost * $("#buyForm [name='buy_count']").val() ) );
+        $("#buyForm .buyAmount").text(dpPrice ($cost * $("#buyForm [name='buy_count']").val()));
+        $("#buyForm .calcAmount").text( dpPrice( point - ( $cost * $("#buyForm [name='buy_count']").val() ) ) );
     })
 
 
