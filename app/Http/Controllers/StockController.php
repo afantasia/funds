@@ -35,18 +35,20 @@ class StockController extends Controller
     //
     public function makeNews(){
         $newsStringInfo=DB::table("news_words")->inRandomOrder()->first();
-        $stockInfo=DB::table("stocks")->inRandomOrder()->first();
-        $title=$this->replaceParam($newsStringInfo->title);
-        $newsModel=new NewsFeedModel();
-        $typeAr=collect(['PLUS',"MINUS","FIXED"])->random();
-        $insArray=[
-            'stock_id'=>$stockInfo->id,
-            'title'=>$title,
-            'type'=>$typeAr,
-            'limit_percent'=>$typeAr =="FIXED" ? 0 : rand(0,1000)/100,
-        ];
-        $idx=$newsModel->insertGetId($insArray);
-        $this->stockChanger($idx);
+        $stockInfos=DB::table("stocks")->inRandomOrder()->take(rand(1,5))->get();
+        foreach($stockInfos as $stockInfo){
+            $title=$this->replaceParam($newsStringInfo->title);
+            $newsModel=new NewsFeedModel();
+            $typeAr=collect(['PLUS',"MINUS","FIXED"])->random();
+            $insArray=[
+                'stock_id'=>$stockInfo->id,
+                'title'=>$title,
+                'type'=>$typeAr,
+                'limit_percent'=>$typeAr =="FIXED" ? 0 : rand(0,1000)/100,
+            ];
+            $idx=$newsModel->insertGetId($insArray);
+            $this->stockChanger($idx);
+        }
         // 영구적으로 캐시 저장
         \Illuminate\Support\Facades\Cache::forever("PUT_KEY", $idx);
         return $idx;

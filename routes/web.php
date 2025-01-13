@@ -21,9 +21,11 @@ Route::name("stock.")->prefix("/stock/")->group(function(){
     Route::get("getNews",[\App\Http\Controllers\StockController::class,'getNews'])->name("getNews");
     Route::get("getCompany",[\App\Http\Controllers\StockController::class,'getCompany'])->name("getCompany");
     Route::get("getStockHistory/{stockId}",[\App\Http\Controllers\StockController::class,'getStockHistory'])->name("getStockHistory");
+    Route::any("recentHistory",[\App\Http\Controllers\TradeController::class,'recentHistory'])->name("recentHistory");
 });
 Route::name("trade.")->prefix("/trade/")->group(function(){
     Route::any("getTradeHistory",[\App\Http\Controllers\TradeController::class,'getTradeHistory'])->name("getTradeHistory");
+
 });
 Route::name("user.")->prefix("/user/")->group(function(){
     Route::post("buy",[\App\Http\Controllers\TradeController::class,'createBuy'])->name("buy");
