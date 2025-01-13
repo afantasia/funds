@@ -28,6 +28,64 @@ class TradeController extends Controller
         return $return;
     }
 
+    public function recentHistory(Request $request)
+    {
+        $model = new StockHistoryModel();
+        $orgDatas = $model
+            ->select(
+                "stock_historys.now_amount",
+                "stock_historys.stock_id",
+                DB::raw("DATE_FORMAT(stock_historys.created_at, '%y-%m-%d %H:%i') AS date")
+            )
+            ->orderBy("created_at", "desc")
+            ->limit(100)
+            ->get();
+
+        // 데이터를 그룹화
+        $groupedDatas = $orgDatas->groupBy('stock_id');
+
+        $stockModel = new StockModel();
+        $stockData = $stockModel
+            ->whereIn("id", collect($orgDatas)->groupBy("stock_id")->keys()->toArray())
+            ->get()
+            ->keyBy("id");
+
+        // 전체 날짜 범위 추출 (모든 날짜를 포함한 배열 생성)
+        $allDates = $orgDatas->pluck('date')->unique()->sort()->values();
+
+        // Chart.js 포맷으로 변환
+        $datas = $groupedDatas->map(function ($items, $stockId) use ($stockData, $allDates) {
+            // 정렬된 데이터
+            $sortedItems = $items->sortBy('date');
+
+            // 누락된 데이터를 이전 값으로 채우기
+            $filledData = $allDates->map(function ($date) use ($sortedItems) {
+                static $lastValue = null; // 이전 값을 저장
+
+                // 현재 날짜에 해당하는 데이터가 있으면 값 갱신
+                $currentItem = $sortedItems->firstWhere('date', $date);
+
+                if ($currentItem) {
+                    $lastValue = (float) $currentItem->now_amount;
+                }
+
+                // 현재 날짜와 이전 값을 반환
+                return [
+                    'x' => $date,
+                    'y' => $lastValue,
+                ];
+            });
+
+            return [
+                'label' => $stockData[$stockId]->name,
+                'data' => $filledData,
+            ];
+        })->values();
+
+
+        return ["code" => "0000", "datas" => $datas];
+    }
+
     public function createBuy(Request $request)
     {
         $return=[];  //example : ["code"=>"0001","message"=>"잘못된 접근입니다","datas"=>[]]

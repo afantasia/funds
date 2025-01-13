@@ -17,6 +17,9 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/collect.js/4.18.3/collect.min.js" integrity="sha512-LkKpealLJ+RNIuYaXSC+l/0Zf5KjYCpMaUrON9WUC+LG316w3UEImyaUpWMWfqNGC4vLOkxDWEVKQE+Wp0shKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
     <script type="text/javascript">
         /**
          * 템플릿 문자열에서 [[...]] 안의 키를 실제 값으로 치환하는 함수
@@ -75,7 +78,7 @@
                     @include("components.property")
                 </div>
                 <div class="col-6">
-                    @include("components.chart")
+                    @include("components.trade-chart")
                 </div>
             </div>
             <div class="row mb-3">
