@@ -22,6 +22,12 @@ class StockController extends Controller
     public function getCompany(Request $request){
         $stockModel=new StockModel();
         $datas=$stockModel->get();
+        $datas=collect($datas)->each(function($item){
+           $model=new StockHistoryModel();
+           $item->cost=$model->where("stock_id",$item->id)->orderBy("created_at","desc")->first()->now_amount;
+           return $item;
+        });
+
         return $datas;
     }
 

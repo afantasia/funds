@@ -31,8 +31,6 @@
             });
         }
         function showModal(id) {
-            console.log(id);
-            console.log(document.getElementById(id));
             const Modal = new bootstrap.Modal(document.getElementById(id));
             Modal.show();
         }
@@ -67,11 +65,14 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light" @auth loginid="{!! Auth::id() !!}" @endauth>
             @include("components.nav")
         </nav>
-        <div class="container-fluid">
+        <div class="container-fluid mt-3">
             <div class="row mb-3">
-                <div class="col-6">
+                <div class="col-4">
                     @include("components.news")
 
+                </div>
+                <div class="col-2">
+                    @include("components.property")
                 </div>
                 <div class="col-6">
                     @include("components.chart")
@@ -115,10 +116,8 @@
                     // 변경에 따른 추가 작업 실행
                     handleCacheUpdate(globalCache);
                 } else {
-                    console.log('Cache is up-to-date.');
+
                 }
-            } else {
-                console.warn('No cache value available.');
             }
         } catch (error) {
             console.error('Error fetching cache:', error);
@@ -127,7 +126,6 @@
 
     // 캐시 변경 시 추가 작업을 처리하는 함수
     const handleCacheUpdate = (updatedCache) => {
-        console.log('Updated Cache:', updatedCache);
         // 필요한 추가 로직을 여기에 작성
         notify("NEWS", "새로운 뉴스가 있습니다.")
     };
@@ -136,7 +134,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         syncCache(); // 초기 캐시 동기화
         // 5초마다 캐시 동기화
-        const second = 60 * 1000;
+        const second = 5 * 1000;
         setInterval(syncCache, second);
     });
 

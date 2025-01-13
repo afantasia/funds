@@ -19,7 +19,11 @@ class TradeController extends Controller
         if(Auth::check()){
             $model=new StockTradesModel();
             $return['code']="0000";
-            $return['datas']=$model->where([['user_id','=',Auth::user()->id]])->orderBy("created_at","desc")->get();
+            if($request->type=='last'){
+                $return['datas']=$model->where([['user_id','=',Auth::user()->id]])->orderBy("created_at","desc")->first();
+            }else{
+                $return['datas']=$model->where([['user_id','=',Auth::user()->id]])->orderBy("created_at","desc")->get();
+            }
         }
         return $return;
     }
@@ -51,6 +55,7 @@ class TradeController extends Controller
                 $inventoryM=new inventoryModel();
                 $buyResId=$inventoryM->insertGetId([
                     'user_id'=>auth()->id(),
+                    'history_id'=>$priceData->id,
                     'stock_id'=>$stock->id,
                     'amount'=>$buyCount,
                 ]);
@@ -95,12 +100,18 @@ class TradeController extends Controller
         try {
             $model=new inventoryModel();
             $datas = $model
-                ->select("inventories.*",DB::raw("stocks.name as company_name"))
+                ->select("inventories.*",DB::raw("stocks.name as company_name"),DB::raw("stock_historys.now_amount as cost"))
                 ->where([[
                 "user_id","=",auth()->id()
             ]])->leftJoin("stocks", "stocks.id", "=", "inventories.stock_id")
-
+                ->leftJoin("stock_historys", "stock_historys.id", "=", "inventories.history_id")
                 ->orderBy("created_at","desc")->get();
+            $datas=collect($datas)->map(function($item){
+                $model=new StockHistoryModel();
+                $data=$model->where([["stock_id","=",$item->stock_id]])->orderBy("created_at","desc")->first();
+                $item->now_cost = $data->now_amount;
+                return $item;
+            });
             $return=["code"=>"0000","message"=>"데이터 로드 성공","datas"=>$datas];
             return $return;
         }catch (\Exception $e) {

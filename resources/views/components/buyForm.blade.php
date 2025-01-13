@@ -16,8 +16,13 @@
                         <label class="form-label">구매수량</label>
                         <input type="number" class="form-control" placeholder="수량을 입력해주세요" value="1" name="buy_count">
                     </div>
+                    <div class="mb-3">
+                        <div>내잔액 : <span class="myPoint"></span> </div>
+                        <div>총매수금액 :  <span class="buyAmount"></span> </div>
+                        <div>매수 후 잔액 :  <span class="calcAmount"></span> </div>
+                    </div>
                     <div class="d-grid">
-                        <button type="button" class="btn btn-primary btn-submit" >제출</button>
+                        <button type="button" class="btn btn-primary btn-submit" >매수가즈아!</button>
                     </div>
                 </form>
             </div>
@@ -30,7 +35,7 @@ $(document).ready(function(){
         $("#buyForm select[name='stock_id']").append(`<option value="">선택하세요</option>`);
         axios.get("/stock/getCompany").then((result)=>{
             result.data.forEach(function(data,index){
-                $("#buyForm select[name='stock_id']").append(`<option value="${data.id}">${data.name}</option>`);
+                $("#buyForm select[name='stock_id']").append(`<option value="${data.id}" data-cost="${data.cost}">${data.name} [P ${data.cost}]</option>`);
             });
         });
     }
@@ -39,9 +44,12 @@ $(document).ready(function(){
     function submitBuy() {
         const formData = $("#buyForm").serialize(); // 폼 데이터를 직렬화
         axios.post("/user/buy",formData).then((result)=>{
-            console.log(result.data);
-            alert('매수완료');
-            window.location.reload();
+            if(result.data.code==0000){
+                alert('매수완료');
+                window.location.reload();
+            }else{
+                alert(result.data.message);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -52,6 +60,13 @@ $(document).ready(function(){
     $("#buyModal button.btn-submit").on("click",function(){
         submitBuy();
     });
+    $("#buyForm [name='buy_count'] , #buyForm [name='stock_id']").on("change",function(){
+        var point = {{ isset($now_amount) ? $now_amount : 0 }};
+        $("#buyForm .myPoint").text(point);
+        $cost = $("#buyForm [name='stock_id'] option:selected").data("cost");
+        $("#buyForm .buyAmount").text($cost * $("#buyForm [name='buy_count']").val());
+        $("#buyForm .calcAmount").text(point - ( $cost * $("#buyForm [name='buy_count']").val() ) );
+    })
 
 
 })
