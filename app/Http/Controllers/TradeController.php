@@ -249,13 +249,12 @@ class TradeController extends Controller
             if($result){
                 //현재 주식가격을 가져옵니다
                 $stockLogM=new StockHistoryModel();
-                $priceData=$stockLogM->where([["stock_id","=",$stock->id]])->orderBy("created_at","desc")->first();
-
+                $priceData=$stockLogM->where([["stock_id","=",$stock->stock_id]])->orderBy("created_at","desc")->first();
 
                 $tradeM=new StockTradesModel();
                 $userTradeData = $tradeM->where([["user_id","=",auth()->id()]])->orderBy("created_at","desc")->first();
                 $buyPrice=$priceData->now_amount * $stock->amount;
-                debug($buyPrice);
+
                 $tradeId = DB::table("stock_trades")->insert([
                     'user_id'=>auth()->id(),
                     'title'=>$stock->company_name.' 주식 매도',
