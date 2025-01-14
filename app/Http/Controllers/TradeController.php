@@ -19,6 +19,7 @@ class TradeController extends Controller
         if(Auth::check()){
             $model=new StockTradesModel();
             $return['code']="0000";
+            $return['msg']="처리완료";
             if($request->type=='last'){
                 $return['datas']=$model->where([['user_id','=',Auth::user()->id]])->orderBy("created_at","desc")->first();
             }else{
@@ -28,6 +29,56 @@ class TradeController extends Controller
         return $return;
     }
 
+    public function getMyAsset()
+    {
+        $return=['code'=>'9999',"msg"=>'접근권한없음','datas'=>[]];
+        if(Auth::check()){
+            $iModel=new inventoryModel();
+            $return['code']="0000";
+            $fundDatas = $iModel
+                ->select("inventories.*","stocks.name as stock_name","stock_historys.now_amount as buy_cost")
+                ->where([
+                    ["user_id","=",Auth::user()->id]
+                ])
+                ->leftJoin("stocks","stocks.id","=","inventories.stock_id")
+                ->leftJoin("stock_historys","stock_historys.id","=","inventories.history_id")
+                ->get();
+
+            $fundDatas = $fundDatas->each(function($item,$key){
+                $d = DB::table("stock_historys")->where("stock_id","=",$item->stock_id)->orderBy("created_at","desc")->first();
+                $item->now_cost = $d->now_amount;
+                $item->now_asset = $item->amount * $item->now_cost;#현존가치
+                $item->buy_asset = $item->amount * $item->buy_cost;#구매당시 가치
+                return $item;
+            });
+            $req=new Request(['type'=>"last"]);
+            $cashData = $this->getTradeHistory($req);
+            $cash=[
+                "id" => 0,
+                "user_id" => Auth::user()->id,
+                "stock_id" => 0,
+                "amount" => 0,
+                "history_id" => 0,
+                "created_at" => null,
+                "updated_at" => null,
+                "deleted_at" => null,
+                "stock_name" => "현금",
+                "buy_cost" => $cashData['datas']->now_amount,
+                "now_cost" => $cashData['datas']->now_amount,
+                "now_asset" => $cashData['datas']->now_amount,
+                "buy_asset" => $cashData['datas']->now_amount,
+            ];
+            $datas=[
+                'cash'=>$cash,
+                'funds' => $fundDatas,
+            ];
+
+
+            $return=['code'=>'0000',"msg"=>'처리완료','datas'=>$datas];
+        }
+
+        return $return;
+    }
     public function recentHistory(Request $request)
     {
         $model = new StockHistoryModel();

@@ -31,5 +31,6 @@ Route::name("user.")->prefix("/user/")->group(function(){
     Route::post("buy",[\App\Http\Controllers\TradeController::class,'createBuy'])->name("buy");
     Route::post("sell",[\App\Http\Controllers\TradeController::class,'createSell'])->name("sell");
     Route::any("inventory",[\App\Http\Controllers\TradeController::class,'getMyInventory'])->name("getMyInventory");
+    Route::any("getMyAsset",[\App\Http\Controllers\TradeController::class,'getMyAsset'])->name("getMyAsset");
 });
 Route::get('sync',[\App\Http\Controllers\Controller::class,'getCache'])->name("sync");

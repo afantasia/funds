@@ -44,10 +44,10 @@
 
             // 데이터 치환 후 추가
             result.data.datas.forEach((data) => {
-                data.fee_amount = data.fee_amount.toLocaleString();
-                data.before_amount = data.before_amount.toLocaleString();
-                data.calc_amount = data.calc_amount.toLocaleString();
-                data.now_amount = data.now_amount.toLocaleString();
+                data.fee_amount = dpPrice(data.fee_amount.toLocaleString());
+                data.before_amount = dpPrice(data.before_amount.toLocaleString());
+                data.calc_amount = dpPrice(data.calc_amount.toLocaleString());
+                data.now_amount = dpPrice(data.now_amount.toLocaleString());
                 const rowHtml = replaceTemplate(template, data);
                 $tbody.append(rowHtml);
             });
