@@ -23,7 +23,6 @@
             return color;
         }
         axios.post("/stock/recentHistory",{}).then((result)=> {
-            console.log(result.data.datas);
             var ctDatas=result.data.datas;
             // Chart.js 초기화
             new Chart(document.getElementById("recentChartCtx"), {
