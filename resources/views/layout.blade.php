@@ -122,6 +122,7 @@
     // 캐시 동기화 함수
     const syncCache = async () => {
         try {
+            /*
             const response = await axios.get('/sync');
             if (response.data.status === 'success') {
                 const newCache = response.data.data;
@@ -134,6 +135,8 @@
 
                 }
             }
+
+             */
         } catch (error) {
             console.error('Error fetching cache:', error);
         }

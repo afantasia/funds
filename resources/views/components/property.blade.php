@@ -43,7 +43,7 @@
            chartData = chartData.merge([$datas.cash]); // $datas.cash 추가
            chartData = chartData.merge(funds); // $datas.funds 추가
            $("#assetInfo .cashPrice").text(dpPrice( $datas.cash.now_asset ));
-           $("#assetInfo .fundsPrice").text(dpPrice( collect(funds).sum("now_asset") ));
+           $("#assetInfo .fundsPrice").text(dpPrice( collect(funds).sum("now_asset") + eval($datas.cash.now_asset) ));
            const ctx = document.getElementById('properyCtx');
            const data = {
                labels: chartData.pluck("stock_name").toArray(),
