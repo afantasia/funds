@@ -1,12 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" data-bs-theme="light">
 <head>
+    <script>
+        (function(){
+            var s = localStorage.getItem('bs-theme');
+            var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-bs-theme', s || (d ? 'dark' : 'light'));
+        })();
+    </script>
     <meta charset="utf-8">
     <title>ㅔ?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Custom fonts for this template-->
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        [data-bs-theme="dark"] .wrap { background-color: var(--bs-body-bg); min-height: 100vh; }
+        [data-bs-theme="dark"] .navbar { --bs-navbar-color: rgba(255,255,255,.85); --bs-navbar-hover-color: #fff; }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
@@ -51,7 +62,22 @@
             } else {
                 console.error('CSRF meta tag not found in the document.');
             }
+            // 다크 테마 초기화 (localStorage 또는 시스템 설정)
+            const saved = localStorage.getItem('bs-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
         });
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('bs-theme', theme);
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-bs-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+            return next;
+        }
 
 
         function notify(title, message) {
@@ -77,7 +103,7 @@
 <body >
 <div class="wrap">
     <div id="app">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light" @auth loginid="{!! Auth::id() !!}" @endauth>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light bg-body" @auth loginid="{!! Auth::id() !!}" @endauth>
             @include("components.nav")
         </nav>
         <div class="container-fluid mt-3">
