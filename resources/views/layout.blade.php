@@ -62,11 +62,6 @@
             } else {
                 console.error('CSRF meta tag not found in the document.');
             }
-            // 다크 테마 초기화 (localStorage 또는 시스템 설정)
-            const saved = localStorage.getItem('bs-theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = saved || (prefersDark ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-bs-theme', theme);
         });
         function setTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
