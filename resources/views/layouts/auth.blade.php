@@ -44,10 +44,6 @@
             document.querySelectorAll('.theme-icon-light').forEach(function(el) { el.style.display = next === 'dark' ? 'none' : ''; });
             return next;
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.getElementById('themeToggle');
-            if (btn) btn.addEventListener('click', function() { toggleTheme(); });
-        });
     </script>
 </body>
 </html>
