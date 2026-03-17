@@ -40,16 +40,22 @@ class GoogleLoginController extends BaseController
                 'name' => $userInfo->getName(),
                 'nick_name' => $userInfo->getNickname(),
                 'avatar' => $userInfo->getAvatar(),
-                'password' => "NONE",
                 'token' => $userInfo->token,
                 'refresh_token' => $userInfo->refreshToken,
             ];
             if (!isset($user->id)) {
                 $params['email'] = $userInfo->getEmail();
                 $params['email_verified_at'] = date("Y-m-d H:i:s");
+                $params['password'] = 'NONE';
                 $sessionID = $model->insertGetID($params);
             } else {
                 $sessionID = $user->id;
+                // 수동 가입 사용자(해시된 비밀번호 보유)는 password를 덮어쓰지 않음 — 수동 로그인 유지
+                if ($user->password !== 'NONE') {
+                    unset($params['password']);
+                } else {
+                    $params['password'] = 'NONE';
+                }
                 $model->where("id", $sessionID)->update($params);
             }
 
@@ -65,9 +71,11 @@ class GoogleLoginController extends BaseController
 
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect(route("home"));
     }
 

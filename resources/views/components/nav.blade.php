@@ -5,7 +5,12 @@
             <i class="xi-moon theme-icon-dark" style="display:none;"></i>
             <i class="xi-sun theme-icon-light"></i>
         </button>
-        <a class="btn btn-primary" href="@if(Auth::check()) logout @else login @endif"> @if(Auth::check()) 로그아웃 @else 로그인 @endif</a>
+        @auth
+            <a class="btn btn-primary" href="{{ route('logout') }}">로그아웃</a>
+        @else
+            <a class="btn btn-outline-primary" href="{{ route('login') }}">로그인</a>
+            <a class="btn btn-primary" href="{{ route('register') }}">회원가입</a>
+        @endauth
     </div>
 </div>
 <script>
