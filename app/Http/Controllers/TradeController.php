@@ -227,6 +227,50 @@ class TradeController extends Controller
             return ["code"=>"0001","message"=>"실패했습니다","errors"=>$e->getMessage()];
         }
     }
+    public function resetAsset(Request $request)
+    {
+        $return = ['code' => '9999', 'msg' => '접근권한없음'];
+        if (!Auth::check()) {
+            return $return;
+        }
+
+        $userId = Auth::id();
+
+        DB::beginTransaction();
+        try {
+            $inventoryM = new inventoryModel();
+            $inventories = $inventoryM->where('user_id', '=', $userId)->get();
+
+            $stockM = new StockModel();
+            foreach ($inventories as $item) {
+                $stockM->where('id', '=', $item->stock_id)
+                    ->increment('stock_count', $item->amount);
+            }
+
+            $inventoryM->where('user_id', '=', $userId)->delete();
+
+            $tradeM = new StockTradesModel();
+            $tradeM->where('user_id', '=', $userId)->delete();
+
+            $tradeM->insert([
+                'user_id'       => $userId,
+                'title'         => '마포대교 급행열차 (자산 리셋)',
+                'before_amount' => 0,
+                'calc_amount'   => env('DEFAULT_STOCK_CASH', 10000000),
+                'fee_amount'    => 0,
+                'now_amount'    => env('DEFAULT_STOCK_CASH', 10000000),
+            ]);
+
+            DB::commit();
+            $return = ['code' => '0000', 'msg' => '자산이 초기화되었습니다. 새 출발입니다!'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $return = ['code' => '0001', 'msg' => '리셋 처리 중 오류가 발생했습니다.'];
+        }
+
+        return $return;
+    }
+
     public function createSell(Request $request)
     {
         $return=[];

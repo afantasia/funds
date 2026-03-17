@@ -16,6 +16,14 @@
         <div>
             <canvas id="properyCtx"></canvas>
         </div>
+        @auth
+        <hr>
+        <div class="d-grid">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="showModal('resetModal')">
+                <i class="xi-refresh"></i> 마포대교 급행열차
+            </button>
+        </div>
+        @endauth
     </div>
 </div>
 
