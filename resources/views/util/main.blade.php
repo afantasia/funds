@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>ㅔ?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css" >
+    <link rel="stylesheet" href="{{ asset('css/xeicon/xeicon.min.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script
             src="https://code.jquery.com/jquery-3.6.1.min.js"
