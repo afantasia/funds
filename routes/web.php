@@ -14,9 +14,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name("home");
-Route::get('/login', [\App\Http\Controllers\GoogleLoginController::class, 'redirect'])->name("login");
-Route::get('/logout', [\App\Http\Controllers\GoogleLoginController::class, 'logout'])->name("logout");
+
+// 수동 인증 (이메일+비밀번호)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->name("login");
+    Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
+    Route::get('/register', [\App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name("register");
+    Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
+});
+// 소셜 로그인 (Google) — 진입 경로만 분리, 기존 유지
+Route::get('/auth/google', [\App\Http\Controllers\GoogleLoginController::class, 'redirect'])->name("auth.google");
 Route::get('/callback', [\App\Http\Controllers\GoogleLoginController::class, 'callback'])->name("callback");
+Route::get('/logout', [\App\Http\Controllers\GoogleLoginController::class, 'logout'])->name("logout");
 Route::name("stock.")->prefix("/stock/")->group(function(){
     Route::get("getNews",[\App\Http\Controllers\StockController::class,'getNews'])->name("getNews");
     Route::get("getCompany",[\App\Http\Controllers\StockController::class,'getCompany'])->name("getCompany");
