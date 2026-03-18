@@ -32,7 +32,8 @@ $(document).ready(function(){
     function getinventory() {
         $("#sellForm select[name='inven_id']").append(`<option value="">선택하세요</option>`);
 
-        axios.get("/user/inventory").then((result)=>{
+        getInventoryData().then((result)=>{
+            if(!result.data.datas || !result.data.datas.length) return;
             result.data.datas.forEach(function(data,index){
                 $("#sellForm select[name='inven_id']").append(`<option value="${data.id}" data-amount="${data.amount}" data-cost="${data.cost}" data-now-cost="${data.now_cost}">${data.company_name} ${data.amount}주</option>`);
             });
