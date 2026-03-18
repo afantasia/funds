@@ -116,6 +116,11 @@
             </div>
             <div class="row mb-3">
                 <div class="col-12">
+                    @include("components.inventory")
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
                     @include("components.trade")
                 </div>
             </div>
