@@ -63,6 +63,15 @@
                 console.error('CSRF meta tag not found in the document.');
             }
         });
+        var _inventoryCache = null;
+        function getInventoryData() {
+            if (_inventoryCache) return Promise.resolve(_inventoryCache);
+            return axios.get("/user/inventory").then(function(r) {
+                _inventoryCache = r;
+                return r;
+            });
+        }
+
         function setTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
             localStorage.setItem('bs-theme', theme);

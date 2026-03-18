@@ -58,8 +58,8 @@
 @auth
 <script>
 $(document).ready(function(){
-    axios.get("/user/inventory").then(function(result){
-        if(result.data.code !== "0000" || !result.data.datas.length) {
+    getInventoryData().then(function(result){
+        if(result.data.code !== "0000" || !result.data.datas || !result.data.datas.length) {
             $("#inventoryEmpty").removeClass("d-none");
             $("#inventory-table").addClass("d-none");
             return;
@@ -118,6 +118,9 @@ $(document).ready(function(){
         $("#totalEvalAmount").text(dpPrice(sumEval));
         $("#totalProfitAmount").text((sumProfit >= 0 ? '+' : '') + dpPrice(sumProfit)).addClass(profitClass);
         $("#totalProfitRate").text((sumRate >= 0 ? '+' : '') + sumRate.toFixed(2) + '%').addClass(profitClass);
+    }).catch(function(){
+        $("#inventoryEmpty").removeClass("d-none").text("데이터를 불러오지 못했습니다.");
+        $("#inventory-table").addClass("d-none");
     });
 });
 </script>
