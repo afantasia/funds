@@ -130,6 +130,11 @@
             </div>
             <div class="row mb-3">
                 <div class="col-12">
+                    @include("components.ranking")
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
                     @include("components.trade")
                 </div>
             </div>

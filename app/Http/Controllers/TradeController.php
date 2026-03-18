@@ -7,6 +7,7 @@ use App\Models\StockHistoryModel;
 use App\Models\StockModel;
 use App\Models\StockTradesModel;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -269,6 +270,62 @@ class TradeController extends Controller
         }
 
         return $return;
+    }
+
+    public function getRanking()
+    {
+        // 유저별 최신 현금 잔고
+        $cashSub = DB::table('stock_trades')
+            ->select('user_id', 'now_amount as cash')
+            ->whereNull('deleted_at')
+            ->whereIn('id', function ($q) {
+                $q->select(DB::raw('MAX(id)'))
+                    ->from('stock_trades')
+                    ->whereNull('deleted_at')
+                    ->groupBy('user_id');
+            });
+
+        // 종목별 최신 시세 (soft delete 제외)
+        $latestPriceSub = DB::table('stock_historys')
+            ->select('stock_id', 'now_amount')
+            ->whereNull('deleted_at')
+            ->whereIn('id', function ($q) {
+                $q->select(DB::raw('MAX(id)'))
+                    ->from('stock_historys')
+                    ->whereNull('deleted_at')
+                    ->groupBy('stock_id');
+            });
+
+        // 유저별 보유주식 평가액
+        $stockByUser = DB::table('inventories')
+            ->select('inventories.user_id', DB::raw('SUM(inventories.amount * latest.now_amount) as stock_value'))
+            ->joinSub($latestPriceSub, 'latest', 'inventories.stock_id', '=', 'latest.stock_id')
+            ->whereNull('inventories.deleted_at')
+            ->groupBy('inventories.user_id')
+            ->get()
+            ->keyBy('user_id');
+
+        $cashByUser = $cashSub->get()->keyBy('user_id');
+
+        $userIds = $cashByUser->keys()->merge($stockByUser->keys())->unique();
+        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
+
+        // 총 자산 계산 → 상위 10명
+        $ranking = $userIds->map(function ($uid) use ($cashByUser, $stockByUser, $users) {
+            $cash  = isset($cashByUser[$uid]) ? $cashByUser[$uid]->cash : 0;
+            $stock = isset($stockByUser[$uid]) ? $stockByUser[$uid]->stock_value : 0;
+            $user  = $users[$uid] ?? null;
+            return [
+                'user_id'     => $uid,
+                'name'        => e($user->nick_name ?? $user->name ?? '알 수 없음'),
+                'avatar'      => $user->avatar ?? null,
+                'cash'        => (float) $cash,
+                'stock_value' => (float) $stock,
+                'total_asset' => (float) $cash + (float) $stock,
+            ];
+        })->sortByDesc('total_asset')->values()->take(10);
+
+        return ['code' => '0000', 'datas' => $ranking];
     }
 
     public function createSell(Request $request)
