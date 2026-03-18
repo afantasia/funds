@@ -17,12 +17,32 @@
             <canvas id="properyCtx"></canvas>
         </div>
         @auth
-        <hr>
-        <div class="d-grid">
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="showModal('resetModal')">
-                <i class="xi-refresh"></i> 마포대교 급행열차
-            </button>
-        </div>
+        @endauth
+    </div>
+    <div class="card-footer text-end">
+        @auth
+        <style>
+            @keyframes nuke-pulse {
+                0%, 100% { box-shadow: 0 0 8px rgba(220,53,69,.5); }
+                50% { box-shadow: 0 0 20px rgba(220,53,69,.9), 0 0 40px rgba(255,0,0,.4); }
+            }
+            .btn-nuke {
+                animation: nuke-pulse 1.5s ease-in-out infinite;
+                border: 2px solid #dc3545;
+                text-transform: uppercase;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+            .btn-nuke:hover {
+                animation: none;
+                box-shadow: 0 0 30px rgba(255,0,0,.8), 0 0 60px rgba(220,53,69,.5);
+                transform: scale(1.05);
+                transition: all .2s;
+            }
+        </style>
+        <button type="button" class="btn btn-danger btn-sm btn-nuke" onclick="showModal('resetModal')">
+            <i class="xi-warning"></i> MAPO EXPRESS <i class="xi-warning"></i>
+        </button>
         @endauth
     </div>
 </div>
