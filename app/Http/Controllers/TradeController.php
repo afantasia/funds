@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class TradeController extends Controller
 {
@@ -330,63 +332,97 @@ class TradeController extends Controller
 
     public function createSell(Request $request)
     {
-        $return=[];
-        $model=new inventoryModel();
-        $stock = $model
-                ->select("inventories.*",DB::raw("stocks.name as company_name"))
-                ->where([
-                    ["inventories.user_id","=",auth()->id()],
-                    ["inventories.id","=",$request->inven_id]
-                ])->leftJoin("stocks", "stocks.id", "=", "inventories.stock_id")->first();
+        if (! Auth::check()) {
+            return ['code' => '0001', 'message' => '로그인이 필요합니다.', 'datas' => []];
+        }
 
-        if(isset($stock->id)){
-            DB::beginTransaction();
-            $stockM=new StockModel();
-            //프로세스 순서
-            //1. 인벤토리내에 소프트딜리트로 제거
-            //2. 금액을 증감한다.
-            //3. 주식의 수량을 감소시킨다.
-            $result = $model->where("id","=",$stock->id)->delete();
-            if($result){
-                //현재 주식가격을 가져옵니다
-                $stockLogM=new StockHistoryModel();
-                $priceData=$stockLogM->where([["stock_id","=",$stock->stock_id]])->orderBy("created_at","desc")->first();
+        $validator = Validator::make($request->all(), [
+            'stock_id'   => 'required|integer|exists:stocks,id',
+            'sell_count' => 'required|integer|min:1',
+        ]);
+        if ($validator->fails()) {
+            return ['code' => '0001', 'message' => $validator->errors()->first(), 'datas' => []];
+        }
 
-                $tradeM=new StockTradesModel();
-                $userTradeData = $tradeM->where([["user_id","=",auth()->id()]])->orderBy("created_at","desc")->first();
-                $buyPrice=$priceData->now_amount * $stock->amount;
+        $userId = (int) auth()->id();
+        $stockId = (int) $request->input('stock_id');
+        $sellCount = (int) $request->input('sell_count');
 
-                $tradeId = DB::table("stock_trades")->insert([
-                    'user_id'=>auth()->id(),
-                    'title'=>$stock->company_name.' 주식 매도',
-                    'before_amount'=>$userTradeData->now_amount,
-                    'calc_amount'=> $buyPrice ,
-                    'fee_amount'=>0,
-                    'now_amount'=>$userTradeData->now_amount + $buyPrice,
+        try {
+            return DB::transaction(function () use ($userId, $stockId, $sellCount) {
+                $inv = new inventoryModel();
+                $lots = $inv->newQuery()
+                    ->where('user_id', $userId)
+                    ->where('stock_id', $stockId)
+                    ->orderBy('created_at', 'asc')
+                    ->lockForUpdate()
+                    ->get();
+
+                $totalHeld = (int) $lots->sum('amount');
+                if ($totalHeld < $sellCount) {
+                    return ['code' => '0001', 'message' => '보유 수량이 부족합니다.', 'datas' => []];
+                }
+
+                $priceData = (new StockHistoryModel())
+                    ->where('stock_id', $stockId)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                if (! $priceData) {
+                    return ['code' => '0001', 'message' => '시세 정보를 찾을 수 없습니다.', 'datas' => []];
+                }
+
+                $sellProceeds = (float) $priceData->now_amount * $sellCount;
+
+                $remaining = $sellCount;
+                foreach ($lots as $lot) {
+                    if ($remaining <= 0) {
+                        break;
+                    }
+                    $take = min((int) $lot->amount, $remaining);
+                    if ($take === (int) $lot->amount) {
+                        $inv->newQuery()->where('id', $lot->id)->delete();
+                    } else {
+                        $inv->newQuery()->where('id', $lot->id)->update([
+                            'amount' => (int) $lot->amount - $take,
+                        ]);
+                    }
+                    $remaining -= $take;
+                }
+
+                if ($remaining !== 0) {
+                    throw new \RuntimeException('FIFO 처리 불일치');
+                }
+
+                $lastTrade = DB::table('stock_trades')
+                    ->where('user_id', $userId)
+                    ->whereNull('deleted_at')
+                    ->orderByDesc('id')
+                    ->lockForUpdate()
+                    ->first();
+                $beforeCash = $lastTrade ? (float) $lastTrade->now_amount : 0.0;
+                $afterCash = $beforeCash + $sellProceeds;
+
+                $stockRow = (new StockModel())->newQuery()->where('id', $stockId)->first();
+                $companyName = $stockRow ? $stockRow->name : '';
+
+                DB::table('stock_trades')->insert([
+                    'user_id'       => $userId,
+                    'title'         => $companyName.' 주식 매도 '.$sellCount.'주',
+                    'before_amount' => $beforeCash,
+                    'calc_amount'   => $sellProceeds,
+                    'fee_amount'    => 0,
+                    'now_amount'    => $afterCash,
                 ]);
 
-                if($tradeId > 0){
-                    $upResult = $stockM->where("id","=",$stock->stock_id)->increment("stock_count",$stock->amount);
-                    if($upResult){
-                        DB::commit();
-                        $return=["code"=>"0003","message"=>"매도 완료","datas"=>[]];
-                    }else{
-                        DB::rollBack();
-                        $return=["code"=>"0003","message"=>"매도 실패.","datas"=>[]];
-                    }
-                }else{
-                    DB::rollBack();
-                    $return=["code"=>"0002","message"=>"매도 실패.","datas"=>[]];
+                $stockM = new StockModel();
+                if (! $stockM->where('id', $stockId)->increment('stock_count', $sellCount)) {
+                    throw new \RuntimeException('유통 주식 수 갱신 실패');
                 }
-            }else{
-                DB::rollBack();
-                $return=["code"=>"0001","message"=>"매도 실패.","datas"=>[]];
-            }
 
-        }else{
-            $return=["code"=>"0001","message"=>"주식이 없습니다.","datas"=>[]];
+                return ['code' => '0003', 'message' => '매도 완료', 'datas' => []];
+            });
+        } catch (Throwable $e) {
+            return ['code' => '0001', 'message' => '매도 처리 중 오류가 발생했습니다.', 'datas' => []];
         }
-        return $return;
-
     }
 }

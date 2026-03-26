@@ -71,6 +71,9 @@
                 return r;
             });
         }
+        function invalidateInventoryCache() {
+            _inventoryCache = null;
+        }
 
         function setTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
