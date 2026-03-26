@@ -12,9 +12,18 @@
                         <label class="form-label">종목 선택</label>
                         <select name="stock_id" class="form-select"></select>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">매도 수량</label>
                         <input type="number" name="sell_count" class="form-control" min="1" value="1" autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <div class="small text-muted mb-1">보유 대비 비율</div>
+                        <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="매도 수량 비율">
+                            <button type="button" class="btn btn-outline-secondary sell-qty-pct" data-pct="0.25">25%</button>
+                            <button type="button" class="btn btn-outline-secondary sell-qty-pct" data-pct="0.5">50%</button>
+                            <button type="button" class="btn btn-outline-secondary sell-qty-pct" data-pct="0.75">75%</button>
+                            <button type="button" class="btn btn-outline-secondary sell-qty-pct" data-pct="1">100%</button>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <div>내잔액 : <span class="myPoint"></span> </div>
@@ -121,6 +130,32 @@ $(document).ready(function(){
         updateSellPreview();
     });
 
+    function getMaxSellQty() {
+        var $opt = $("#sellForm [name='stock_id'] option:selected");
+        return parseInt($opt.data("total"), 10) || 0;
+    }
+
+    function setSellQtyFromPct(pct) {
+        var maxTotal = getMaxSellQty();
+        if (!maxTotal || !$("#sellForm [name='stock_id']").val()) {
+            return;
+        }
+        var qty = pct >= 1 ? maxTotal : Math.max(1, Math.floor(maxTotal * pct));
+        if (qty > maxTotal) {
+            qty = maxTotal;
+        }
+        $("#sellForm [name='sell_count']").val(qty);
+        updateSellPreview();
+    }
+
+    $("#sellForm .sell-qty-pct").on("click", function(){
+        var pct = parseFloat($(this).data("pct"));
+        if (isNaN(pct)) {
+            return;
+        }
+        setSellQtyFromPct(pct);
+    });
+
     function submitSell() {
         var stockId = $("#sellForm [name='stock_id']").val();
         var sellCount = $("#sellForm [name='sell_count']").val();
@@ -128,14 +163,23 @@ $(document).ready(function(){
             alert('종목을 선택하세요.');
             return;
         }
+        var $btn = $("#sellModal button.btn-submit");
+        $btn.prop("disabled", true);
         var formData = $("#sellForm").serialize();
         axios.post("/user/sell", formData).then(function(result){
             if (result.data && result.data.code === '0003') {
-                alert('매도완료');
                 if (typeof invalidateInventoryCache === 'function') {
                     invalidateInventoryCache();
                 }
-                window.location.reload();
+                if (typeof notify === 'function') {
+                    notify('매도', '매도가 완료되었습니다.');
+                    window.setTimeout(function(){
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    alert('매도완료');
+                    window.location.reload();
+                }
             } else {
                 alert((result.data && result.data.message) ? result.data.message : '매도에 실패했습니다.');
             }
@@ -145,6 +189,8 @@ $(document).ready(function(){
                 ? error.response.data.message
                 : '요청 처리 중 오류가 발생했습니다.';
             alert(msg);
+        }).finally(function(){
+            $btn.prop("disabled", false);
         });
     }
 
